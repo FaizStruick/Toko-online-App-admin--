@@ -1,7 +1,13 @@
-import { clerkMiddleware } from '@clerk/nextjs/server';
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-// Biarkan kosong dulu supaya aplikasi bisa jalan
-export default clerkMiddleware();
+// Pastikan halaman sign-in dan sign-up TIDAK diproteksi
+const isPublicRoute = createRouteMatcher(['/sign-in(.*)', '/sign-up(.*)', '/api/:path*']);
+
+export default clerkMiddleware(async (auth, request) => {
+  if (!isPublicRoute(request)) {
+    await auth.protect();
+  }
+});
 
 export const config = {
   matcher: [
