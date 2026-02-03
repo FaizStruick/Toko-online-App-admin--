@@ -38,6 +38,7 @@ const onSubmit = async (values: z.infer<typeof formSchema>) => {
         const response = await axios.post('/api/stores', values);
         console.log(response.data);
         toast.success("Berhasil membuat toko");
+        window.location.assign(`/${response.data.id}`)
     } catch (error){
         toast.error("Gagal membuat store");
     } finally {
