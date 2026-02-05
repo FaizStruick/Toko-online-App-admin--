@@ -8,15 +8,18 @@ export default async function DashboardLayout ({
     params,
 }: {
     children: React.ReactNode,
-    params: {storeId: string}
+    params: Promise<{storeId: string}>
 }) {
     const { userId } = await auth();
+
+    const resolvedParams = await params;
+
     if(!userId){
-        redirect("sign-in")
+        redirect("/sign-in")
     }
     const store = await db.store.findFirst({
         where: {
-            id: params.storeId,
+            id: resolvedParams.storeId,
             userId
         }
     })
@@ -28,7 +31,6 @@ export default async function DashboardLayout ({
         <>
         <Navbar />
         {children}
-
         </>
      )
 }

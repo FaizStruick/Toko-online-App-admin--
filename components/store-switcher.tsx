@@ -31,12 +31,13 @@ const StoreSwitcher = ({
 
     const [open, setOpen] = useState(false);
 
-    const currentStore = formattedItems.find((item) => item.value === params.storeId)
+    const currentStore = formattedItems.find((item) => item.value === params?.storeId)
 
     const onStoreSelect = (store: {value: string, label: string}) => {
         setOpen(false);
-        router.push(`/${store.value}`)
-    }
+        router.push(`/${store.value}`);
+        router.refresh();
+    };
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -49,7 +50,7 @@ const StoreSwitcher = ({
             aria-label="Pilih Toko"
             className={cn("w-[200px] justify-between", className)}>
                 <StoreIcon className="mr-2 h-4 w-4"/>
-                {currentStore?.label}
+                {currentStore?.label || "Pilih Toko"}
                 <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0 opacity-50"/>
             </Button>
             </PopoverTrigger>
@@ -67,8 +68,8 @@ const StoreSwitcher = ({
                                 onSelect={() => onStoreSelect(store)}
                                 className="text-sm"
                                 >
-                                    <StoreIcon className="mr-2 h-4 w-4 shrink-0" />
-                                    <span className="truncate">{store.label}</span>
+                                    <StoreIcon className="mr-2 h-4 w-4" />
+                                    <span>{store.label}</span>
                                     <Check 
                                     className={cn(
                                         "ml-auto h-4 w-4",
