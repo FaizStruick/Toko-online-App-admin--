@@ -40,7 +40,7 @@ export const BannerForm: React.FC<BannerFormProps> = ({initialData}) => {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    const title = initialData ? "Edit Banner" : "Buat banner";
+    const title = initialData ? "Buat Banner" : "Edit banner";
     const description = initialData ? "Edit Banner Toko" : "Buat banner Toko";
     const toastMessage = initialData ? "Banner berhasil di edit" : "Banner berhasil di buat";
     const action = initialData ? "Simpan banner" : "Buat banner";
