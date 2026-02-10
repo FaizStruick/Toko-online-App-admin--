@@ -18,6 +18,7 @@ import { useParams, useRouter } from "next/navigation"
 import { AlertModal } from "@/components/modals/alert-modal"
 import { ApiAlert } from "@/components/ui/api-alert"
 import { useOrigin } from "@/hooks/use-origin"
+import ImageUpload from "@/components/ui/image-upload"
 
 interface BannerFormProps {
     initialData: Banner | null;
@@ -41,7 +42,7 @@ export const BannerForm: React.FC<BannerFormProps> = ({initialData}) => {
 
     const title = initialData ? "Edit Banner" : "Buat banner";
     const description = initialData ? "Edit Banner Toko" : "Buat banner Toko";
-    const toastMessage = initialData ? "Edit berhasil di edit" : "Banner berhasil di buat";
+    const toastMessage = initialData ? "Banner berhasil di edit" : "Banner berhasil di buat";
     const action = initialData ? "Simpan banner" : "Buat banner";
 
     const form = useForm<BannerFormValues> ({
@@ -53,11 +54,18 @@ export const BannerForm: React.FC<BannerFormProps> = ({initialData}) => {
     })
 
     const onSubmit = async (data: BannerFormValues) => {
+        console.log("Data yang akan dikirim", data);
+
         try {
             setLoading(true);
-            await axios.patch(`/api/stores/${params.storeId}`, data);
+            if(initialData){
+                await axios.patch(`/api/${params.storeId}/banners/${params.bannerId}`, data);
+            } else {
+                await axios.post(`/api/${params.storeId}/banners`, data);
+            }
             router.refresh();
-            toast.success("Toko berhasil di update");
+            router.push(`/${params.storeId}/banners`);
+            toast.success(toastMessage);
         } catch (error) {
             toast.error("Cek kembali data yang diinput");
         } finally {
@@ -68,10 +76,10 @@ export const BannerForm: React.FC<BannerFormProps> = ({initialData}) => {
     const onDelete = async () => {
         try {
             setLoading(true);
-            await axios.delete(`/api/stores/${params.storeId}`);
+            await axios.delete(`/api/${params.storeId}/banners/${params.bannerId}`);
             router.refresh();
             router.push('/');
-            toast.success("Toko berhasil dihapus");
+            toast.success(toastMessage);
         } catch (error) {
             toast.error("Cek kembali data dan koneksi mu");
         } finally {
@@ -115,11 +123,26 @@ export const BannerForm: React.FC<BannerFormProps> = ({initialData}) => {
                         <FormMessage />
                     </FormItem>
                 )}/>
+
+                <FormField 
+                control={form.control}
+                name="imageUrl"
+                render={({field}) => (
+                    <FormItem>
+                        <FormLabel>Image</FormLabel>
+                        <FormControl>
+                            <ImageUpload 
+                            disabled={loading}
+                            onChange={(url) => field.onChange(url)}
+                            onRemove={() => field.onChange("")}
+                            value={field.value ? [field.value] : []}/>
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}/>
+
             </div>
-            <Button
-            disabled={loading}
-            type="submit">
-            {action}
+            <Button disabled={loading} className="ml-auto" type="submit">{action}
             </Button>
             </form>
         </Form>
