@@ -6,6 +6,9 @@ import { BannerColumn } from "./columns"
 import { Button } from "@/components/ui/button"
 import { Copy, Edit, MoreHorizontal, Trash } from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
+import { useState } from "react"
+import axios from "axios"
+import { AlertModal } from "@/components/modals/alert-modal"
 
 interface CellActionProps {
     data: BannerColumn
@@ -19,11 +22,37 @@ export const CellAction: React.FC<CellActionProps> = ({
     const router = useRouter();
     const params = useParams();
 
+    const [open, setOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
+
     const onCopy = (id: string) => {
         navigator.clipboard.writeText(id);
         toast.success("Banner ID berhasil di copy")
     }
+
+    const onDelete = async () => {
+            try {
+                setLoading(true);
+                await axios.delete(`/api/${params.storeId}/banners/${data.id}`);
+                router.refresh();
+                router.push(`/${params.storeId}/banners`);
+                toast.success("Banner berhasil dihapus");
+            } catch (error) {
+                toast.error("Cek kembali data dan koneksi mu");
+            } finally {
+                setOpen(false);
+                setLoading(false);
+            }
+        }
+
     return (
+        <>
+        <AlertModal 
+        isOpen={open}
+        onClose={() => setOpen(false)}
+        onConfirm={onDelete}
+        loading={loading}
+        />
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost">
@@ -37,15 +66,16 @@ export const CellAction: React.FC<CellActionProps> = ({
                     <Copy className="mr-2 w-4 h-4"/>
                     Copy Id
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push(`/${params.storeId}/banners/${data.id}`)}>
                     <Edit className="mr-2 w-4 h-4"/>
                     Update
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setOpen(true)}>
                     <Trash className="mr-2 w-4 h-4"/>
                     Delete
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
-    )
+        </>
+    );
 }
