@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button"
 import { Heading } from "@/components/ui/heading"
 import { Separator } from "@/components/ui/separator"
 import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
 import { Category, Image, Product } from "@prisma/client"
 import { Trash } from "lucide-react"
 import { useForm } from "react-hook-form"
 
-import * as z from 'zod'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import toast from "react-hot-toast"
@@ -22,15 +22,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 
 interface ProductFormProps {
-    initialData: Product & {
-    images: Image[]
-    }   | null;
+    initialData: (Product  & { 
+    images: Image[] 
+    })| null;
     categories: Category[]
 }
 
 const formSchema = z.object({
     name: z.string().min(1),
-    images: z.object({url: z.string()}).array(),
+    images: z.object({url: z.string()}).array().min(1),
     price: z.coerce.number().min(1),
     categoryId: z.string().min(1),
     isFeatured: z.boolean().default(false).optional(),
@@ -41,7 +41,7 @@ type ProductFormValues = z.infer<typeof formSchema>
 
 export const ProductForm: React.FC<ProductFormProps> = ({initialData, categories}) => {
 
-    const params = useParams();
+    const params = useParams<{ storeId: string; productId: string }>();
     const router = useRouter();
     const origin = useOrigin();
 
@@ -54,13 +54,13 @@ export const ProductForm: React.FC<ProductFormProps> = ({initialData, categories
     const action = initialData ? "Simpan product" : "Buat product";
 
     const form = useForm<ProductFormValues> ({
-        resolver: zodResolver(formSchema),
+        resolver: zodResolver(formSchema) as any,
         defaultValues: initialData ? {
             ...initialData, 
             price: parseFloat(String(initialData.price)),
+            images: initialData.images.map((img) => ({ url: img.url })),
             isFeatured: !!initialData.isFeatured,
             isArchived: !!initialData.isArchived,
-            images: initialData.images.map((img) => ({ url: img.url })),
         } : {
             name: '',
             images:[],
@@ -72,6 +72,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({initialData, categories
     })
 
     const onSubmit = async (data: ProductFormValues) => {
+
         try {
             setLoading(true);
             if(initialData){

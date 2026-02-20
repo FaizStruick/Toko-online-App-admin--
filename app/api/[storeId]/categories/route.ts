@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(
     req: Request,
-    props: {params: Promise<{storeId: string}>}
+    {params}: {params: Promise<{storeId: string}>}
 ){
     try {
         const {userId} = await auth()
@@ -12,10 +12,10 @@ export async function POST(
 
         const {name, bannerId} = body;
 
-        const params = await props.params;
+        const {storeId} =  await params;
 
         if(!userId){
-            return new NextResponse("Unauthorized", {status: 401});
+            return new NextResponse("Unauthenticated", {status: 401});
         }
 
         if(!name){
@@ -26,27 +26,27 @@ export async function POST(
             return new NextResponse("Banner Id perlu diinput", {status: 400});
         }
 
-        if(!params.storeId){
+        if(!storeId){
             return new NextResponse("Store id URL dibutuhkan")
         }
 
         const storeByUserId = await db.store.findFirst({
             where: {
-                id: params.storeId,
+                id: storeId,
                 userId
             }
 
         })
 
         if(!storeByUserId) {
-            return new NextResponse("Unauthorized", {status: 500})
+            return new NextResponse("Unauthorized", {status: 403})
         }
 
         const category = await db.category.create({
             data: {
                 name,
                 bannerId,
-                storeId: params.storeId
+                storeId: storeId,
             }
         })
 
@@ -64,7 +64,8 @@ export async function GET(
 ){
     
     try {
-        const { storeId } = await params; 
+        const resolvedParams = await params;
+        const storeId  = resolvedParams.storeId; 
 
         if(!storeId){
             return new NextResponse("Store id URL dibutuhkan", {status: 400});
@@ -74,9 +75,21 @@ export async function GET(
             where: {
                 storeId: storeId,
             },
+            include: {
+                banner: true,
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
         })
 
-        return NextResponse.json(categories);
+        return NextResponse.json(categories, {
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type",
+            }
+        });
 
     } catch ( error ){
         console.log("[CATEGORIES_GET]", error);

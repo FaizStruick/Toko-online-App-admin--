@@ -2,12 +2,12 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { CellAction } from "./cell-action"
+import { Check, X } from "lucide-react"
 
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
+
 export type ProductColumn = {
   id: string;
-  label: string;
+  name: string;
   price: string;
   category: string;
   isFeatured: boolean;
@@ -23,10 +23,12 @@ export const columns: ColumnDef<ProductColumn>[] = [
   {
     accessorKey: "isFeatured",
     header: "Featured",
+    cell: ({ row }) => row.original.isFeatured ? "Yes" : "No"
   },
   {
     accessorKey: "isArchived",
     header: "Archived",
+    cell: ({ row }) => row.original.isArchived ? "Yes" : "No"
   },
   {
     accessorKey: "price",

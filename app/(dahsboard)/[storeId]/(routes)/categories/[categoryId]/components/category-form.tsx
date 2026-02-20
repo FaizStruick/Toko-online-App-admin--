@@ -111,7 +111,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({initialData, banners}
         <Separator />
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
-            <div className="grid grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <FormField 
                 control={form.control}
                 name="name"
@@ -130,7 +130,6 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({initialData, banners}
                 render={({field}) => (
                     <FormItem>
                         <FormLabel>Banner</FormLabel>
-                        <FormControl>
                             <Select
                             disabled={loading}
                             onValueChange={field.onChange}
@@ -140,7 +139,6 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({initialData, banners}
                                 <FormControl>
                                     <SelectTrigger>
                                         <SelectValue
-                                        defaultValue={field.value}
                                         placeholder="Pilih Banner" 
                                         />
                                     </SelectTrigger>
@@ -153,13 +151,12 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({initialData, banners}
                                     ))}
                                 </SelectContent>
                             </Select>
-                        </FormControl>
                         <FormMessage />
                     </FormItem>
                 )}/>
 
             </div>
-            <Button disabled={loading} className="ml-auto" type="submit">{action}
+            <Button className="flex justify-end" disabled={loading} type="submit">{action}
             </Button>
             </form>
         </Form>

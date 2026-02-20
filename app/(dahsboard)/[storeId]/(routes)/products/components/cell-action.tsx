@@ -27,7 +27,7 @@ export const CellAction: React.FC<CellActionProps> = ({
 
     const onCopy = (id: string) => {
         navigator.clipboard.writeText(id);
-        toast.success("Product ID berhasil di copy")
+        toast.success("Product ID berhasil disalin")
     }
 
     const onDelete = async () => {
@@ -55,7 +55,7 @@ export const CellAction: React.FC<CellActionProps> = ({
         />
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost">
+                <Button variant="ghost" className="h-8 w-8 p-0">
                     <span className="sr-only">Open Menu</span>
                     <MoreHorizontal className="h-4 w-4"/>
                 </Button>
@@ -66,7 +66,7 @@ export const CellAction: React.FC<CellActionProps> = ({
                     <Copy className="mr-2 w-4 h-4"/>
                     Copy Id
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push(`/${params.storeId}/banners/${data.id}`)}>
+                <DropdownMenuItem onClick={() => router.push(`/${params.storeId}/products/${data.id}`)}>
                     <Edit className="mr-2 w-4 h-4"/>
                     Update
                 </DropdownMenuItem>

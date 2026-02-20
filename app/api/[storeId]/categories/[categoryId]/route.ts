@@ -5,19 +5,22 @@ import { NextResponse } from "next/server"
 
 export async function GET (
     req: Request,
-    props: {params: Promise<{categoryId: string}>} 
+    {params}: {params: Promise<{categoryId: string}>} 
 ) {
     try {
 
-        const params = await props.params;
+        const resolvedParams = await params;
 
-        if(!params.categoryId){
+        if(!resolvedParams.categoryId){
             return new NextResponse("Category Id dibutuhkan", {status: 400});
         }
         
         const category = await db.category.findUnique({
             where: {
-                id: params.categoryId,
+                id: resolvedParams.categoryId,
+            },
+            include: {
+                banner: true,
             },
         });
         return NextResponse.json(category);    
@@ -65,7 +68,7 @@ export async function PATCH (
             return new NextResponse("Unauthorized", {status: 403})
         }
         
-        const category = await db.category.updateMany({
+        const category = await db.category.update({
             where: {
                 id: params.categoryId,
             },
@@ -111,7 +114,7 @@ export async function DELETE (
             return new NextResponse("Unauthorized", {status: 403})
         }
         
-        const category = await db.category.deleteMany({
+        const category = await db.category.delete({
             where: {
                 id: params.categoryId,
             },

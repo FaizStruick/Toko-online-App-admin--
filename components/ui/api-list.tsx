@@ -3,6 +3,7 @@
 import { useOrigin } from "@/hooks/use-origin";
 import { useParams } from "next/navigation";
 import { ApiAlert } from "./api-alert";
+import { useMemo } from "react";
 
 interface ApiListProps {
     namaIndikator: string;
@@ -17,7 +18,12 @@ export const ApiList: React.FC<ApiListProps> = ({
     const params = useParams();
     const origin = useOrigin();
 
-    const baseUrl = `${origin}/api/${params.storeId}`
+    const baseUrl = useMemo(() => {
+       return `${origin}/api/${params.storeId}`
+    }, [origin, params.storeId]);
+
+    if(!origin) return null;
+        
 
     return (
         <>
