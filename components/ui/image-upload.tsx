@@ -27,8 +27,10 @@ const ImageUpload: React.FC<imageUploadProps> = ({
     }, []);
 
     const onUpload = (result: any) => {
-        onChange(result.info.secure_url);
-    }
+        if (result?.info && typeof result.info !== 'string' && result.info.secure_url) {
+            onChange(result.info.secure_url);
+        }
+    };
 
     if(!isMounted){
         return null;

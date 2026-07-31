@@ -6,7 +6,7 @@ import { Heading } from "@/components/ui/heading"
 import { Separator } from "@/components/ui/separator"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { Category, Image, Product } from "@prisma/client"
+import { Category, Image, Product, Color, Size } from "@prisma/client"
 import { Trash } from "lucide-react"
 import { useForm } from "react-hook-form"
 
@@ -22,24 +22,33 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 
 interface ProductFormProps {
-    initialData: (Product  & { 
+    initialData: Product  & { 
     images: Image[] 
-    })| null;
-    categories: Category[]
+    } | null;
+    categories: Category[];
+    colors: Color[];
+    sizes: Size[];
 }
 
 const formSchema = z.object({
-    name: z.string().min(1),
-    images: z.object({url: z.string()}).array().min(1),
-    price: z.coerce.number().min(1),
-    categoryId: z.string().min(1),
-    isFeatured: z.boolean().default(false).optional(),
-    isArchived: z.boolean().default(false).optional(),
+    name: z.string().min(1, { message: "Nama produk wajib diisi" }),
+    images: z.object({url: z.string()}).array().min(1, { message: "Minimal unggah 1 Gambar" }),
+    price: z.number().min(1, { message: "Harga harus lebih dari Rp 0" }),
+    categoryId: z.string().min(1, { message: "Kategori wajib diisi" }),
+    colorId: z.string().min(1, { message: "Warna wajib diisi" }),
+    sizeId: z.string().min(1, { message: "Ukuran wajib diisi" }),
+    isFeatured: z.boolean().default(false),
+    isArchived: z.boolean().default(false),
 })
 
 type ProductFormValues = z.infer<typeof formSchema>
 
-export const ProductForm: React.FC<ProductFormProps> = ({initialData, categories}) => {
+export const ProductForm: React.FC<ProductFormProps> = ({
+    initialData, 
+    categories,
+    colors,
+    sizes,
+}) => {
 
     const params = useParams<{ storeId: string; productId: string }>();
     const router = useRouter();
@@ -53,19 +62,24 @@ export const ProductForm: React.FC<ProductFormProps> = ({initialData, categories
     const toastMessage = initialData ? "Product berhasil di edit" : "Product berhasil di buat";
     const action = initialData ? "Simpan product" : "Buat product";
 
-    const form = useForm<ProductFormValues> ({
-        resolver: zodResolver(formSchema) as any,
+    const form = useForm({
+        resolver: zodResolver(formSchema),
         defaultValues: initialData ? {
-            ...initialData, 
-            price: parseFloat(String(initialData.price)),
+            name: initialData.name,
             images: initialData.images.map((img) => ({ url: img.url })),
+            price: parseFloat(String(initialData.price)),
+            categoryId: initialData.categoryId || '',
+            colorId: initialData.colorId || '',
+            sizeId: initialData.sizeId || '',
             isFeatured: !!initialData.isFeatured,
             isArchived: !!initialData.isArchived,
         } : {
             name: '',
-            images:[],
+            images: [],
             price: 0,
             categoryId: '',
+            colorId: '',
+            sizeId: '',
             isFeatured: false,
             isArchived: false,
         },
@@ -105,8 +119,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({initialData, categories
         }
     }
 
-    const currentName = form.watch("name");
-
     return (
         <>
         <AlertModal
@@ -138,8 +150,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({initialData, categories
                             <ImageUpload 
                             disabled={loading}
                             onChange={(url) => field.onChange([...field.value, {url}])}
-                            onRemove={(url) => field.onChange([...field.value.filter((current) => current.url !== url)])}
-                            value={field.value.map(((image) => image.url))}
+                            onRemove={(url) => field.onChange(field.value.filter((current) => current.url !== url))}
+                            value={(field.value || []).map((image) => image.url)}
                         />
                         </FormControl>
                         <FormMessage />
@@ -147,31 +159,31 @@ export const ProductForm: React.FC<ProductFormProps> = ({initialData, categories
                 )}
                 />
 
-            <div className="grid grid-cols-3 gap-8">     
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">     
                 <FormField 
-                control={form.control}
-                name="name"
-                render={({field}) => (
-                    <FormItem>
-                        <FormLabel>Name</FormLabel>
-                        <FormControl>
-                            <Input placeholder="Product Name" disabled={loading} {...field}/>
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
+                    control={form.control}
+                    name="name"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel>Name</FormLabel>
+                            <FormControl>
+                                <Input placeholder="Product Name" disabled={loading} {...field}/>
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
                 )}/>
 
                 <FormField 
-                control={form.control}
-                name="price"
-                render={({field}) => (
-                    <FormItem>
-                        <FormLabel>Harga</FormLabel>
-                        <FormControl>
-                            <Input placeholder="Rp" disabled={loading} {...field} type="number"/>
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
+                    control={form.control}
+                    name="price"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel>Harga</FormLabel>
+                            <FormControl>
+                                <Input placeholder="Rp" disabled={loading} {...field} type="number"/>
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
                 )}/>
                 
             <FormField 
@@ -184,27 +196,102 @@ export const ProductForm: React.FC<ProductFormProps> = ({initialData, categories
                 disabled={loading}
                 onValueChange={field.onChange}
                 value={field.value}
-                defaultValue={field.value}
                 >
                 <FormControl>
-                <SelectTrigger>
-                    <SelectValue
-                        defaultValue={field.value}
-                        placeholder="Pilih Kategori" 
-                    />
-                </SelectTrigger>
+                    <SelectTrigger>
+                        <SelectValue
+                            placeholder="Pilih Kategori" 
+                        />
+                    </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                    {categories.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                            {category.name}
+                        </SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+            <FormMessage />
+            </FormItem>
+        )}
+        />
+
+        <FormField 
+            control={form.control}
+            name="sizeId"
+            render={({field}) => (
+                <FormItem>
+                    <FormLabel>Ukuran (Size)</FormLabel>
+                    <Select
+                        disabled={loading}
+                        onValueChange={field.onChange}
+                        value={field.value}
+                    >
+                    
+                    <FormControl> 
+                        <SelectTrigger>
+                            <SelectValue 
+                                placeholder="Pilih ukuran"
+                                />
+                        </SelectTrigger>
                     </FormControl>
-                        <SelectContent>
-                            {categories.map((category) => (
-                                <SelectItem key={category.id} value={category.id}>
-                                {category.name}
+                    <SelectContent>
+                        {sizes?.length == 0 ? (
+                            <div className="p-2 text-xs text-center text-muted-foreground">
+                                Belum ada ukuran. Tambahkan dulu dimenu Sizes.
+                            </div>
+                        ) : (
+                            sizes?.map((size) => (
+                                <SelectItem key={size.id} value={size.id}>
+                                    {size.name} ({size.value})
                                 </SelectItem>
-                        ))}
-                        </SelectContent>
-                        </Select>
-                        <FormMessage />
-                        </FormItem>
-            )}/>
+                            ))
+                        )}
+                    </SelectContent>
+                    </Select>
+                </FormItem>
+            )}
+        />
+
+        <FormField 
+              control={form.control}
+              name="colorId"
+              render={({field}) => (
+                <FormItem>
+                  <FormLabel>Warna (Color)</FormLabel>
+                  <Select
+                    disabled={loading}
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          
+                          placeholder="Pilih Warna" 
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {colors.map((color) => (
+                        <SelectItem key={color.id} value={color.id}>
+                          <div className="flex items-center gap-x-2">
+                            <div 
+                              className="h-4 w-4 rounded-full border shrink-0" 
+                              style={{ backgroundColor: color.value }}
+                            />
+                            {color.name}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField 
                 control={form.control}
@@ -253,11 +340,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({initialData, categories
                 )}/>
 
             </div>
-            <Button disabled={loading} className="ml-auto" type="submit">{action}
+            <Button disabled={loading} className="ml-auto" type="submit">
+                {action}
             </Button>
             </form>
         </Form>
-        <Separator />
         </>
     );
 }
