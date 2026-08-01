@@ -28,6 +28,8 @@ export const Overview: React.FC<overViewProps> = ({ data }) => {
 
   const chartData = data && data.length > 0 ? data : defaultData;
 
+  const isAllZero = chartData.every((item) => item.total === 0);
+
   return (
     <ResponsiveContainer width="100%" height={350}>
       <BarChart data={chartData}>
@@ -43,7 +45,10 @@ export const Overview: React.FC<overViewProps> = ({ data }) => {
           fontSize={12}
           tickLine={false}
           axisLine={false}
-          tickFormatter={(value) => `Rp${value}`}
+          allowDecimals={false}
+          domain={(isAllZero ? [0, 100000] : [0, "auto"]) as [number, number | string]}
+          tickFormatter={(value) => 
+            `Rp ${new Intl.NumberFormat("id-ID").format(value)}`}
         />
         <Tooltip 
           formatter={(value) => [

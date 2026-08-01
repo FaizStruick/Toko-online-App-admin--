@@ -36,8 +36,8 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
     try {
       setLoading(true)
       await axios.delete(`/api/${params.storeId}/sizes/${data.id}`)
-      router.refresh()
       toast.success("Warna berhasil dihapus.")
+      router.refresh()
     } catch (error) {
       toast.error("Pastikan semua produk yang menggunakan size ini dihapus terlebih dahulu.")
     } finally {

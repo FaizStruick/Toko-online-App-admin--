@@ -2,7 +2,6 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { CellAction } from "./cell-action"
-import { Check, X } from "lucide-react"
 
 
 export type ProductColumn = {
@@ -24,7 +23,7 @@ export const columns: ColumnDef<ProductColumn>[] = [
     )
   },
   {
-    accessorKey: "isFeatured",
+    accessorKey: "isArchived",
     header: "Status Toko",
     cell: ({ row }) => (
       <span
@@ -44,7 +43,7 @@ export const columns: ColumnDef<ProductColumn>[] = [
     )
   },
   {
-    accessorKey: "isArchived",
+    accessorKey: "isFeatured",
     header: "Tampil di utama",
     cell: ({ row }) => (
       <span
@@ -68,6 +67,9 @@ export const columns: ColumnDef<ProductColumn>[] = [
   {
     accessorKey: "category",
     header: "Kategori",
+    cell: ({row}) => (
+      <span className="font-semibold text-slate-900">{row.original.category}</span>
+    )
   },
   {
     accessorKey: "createdAt",
