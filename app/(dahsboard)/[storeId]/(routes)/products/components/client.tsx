@@ -22,13 +22,13 @@ export const ProductClient: React.FC<ProductClientProps> = ({
 
     return (
         <div className="space-y-6">
-        <div className="flex items-center justify-between bg-white p-6 rounded-2xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+        <div className="flex flex-col gap-y-4 sm:flex-row sm:items-center sm:justify-between bg-white p-6 rounded-2xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
            <Heading 
            title= {`Product (${data.length})`}
            description= "Atur product untuk toko"
            />
            <Button onClick={() => router.push(`/${params.storeId}/products/new`)}
-            className="bg-slate-900 hover:bg-slate-600 text-white rounded-xl text-xs font-semibold px-4 py-2.5 transition-all shadow-sm"
+            className="w-full sm:w-auto bg-slate-900 hover:bg-slate-600 text-white rounded-xl text-xs font-semibold px-4 py-2.5 transition-all shadow-sm"
             >
             <Plus className="mr-2 h-4 w-4"/>
             Add Now
@@ -37,10 +37,8 @@ export const ProductClient: React.FC<ProductClientProps> = ({
 
         <Separator className="bg-slate-200/60"/>
 
-        <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-            <div className="min-w-[600px]">
+        <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-x-auto">
         <DataTable data={data} columns={columns} searchKey="name"/>
-            </div>
         </div>
 
         <div className="space-y-4 pt-4">

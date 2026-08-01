@@ -23,7 +23,7 @@ export const BannerClient: React.FC<BannerClientProps> = ({
 
     return (
         <div className="space-y-6">
-        <div className="flex items-center justify-between bg-white p-6 rounded-2xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+        <div className="flex flex-col gap-y-4 sm:flex-row sm:items-center sm:justify-between">
            <Heading 
            title= {`Banner (${data.length})`}
            description= "Atur banner untuk toko"
@@ -38,10 +38,8 @@ export const BannerClient: React.FC<BannerClientProps> = ({
 
         <Separator className="bg-slate-200/60"/>
 
-        <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-            <div className="min-w-[600px]">
+        <div className="bg-white border border-slate-100 rounded-2xl sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-x-auto">
             <DataTable data={data} columns={columns} searchKey="label"/>
-            </div>
         </div>
 
         <div className="space-y-4 pt-4">
@@ -57,7 +55,7 @@ export const BannerClient: React.FC<BannerClientProps> = ({
 
             <Separator className="bg-slate-200/60"/>
 
-            <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+            <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
                 <ApiList namaIndikator="banners" idIndikator="bannerId"/>
                 </div>
             </div>

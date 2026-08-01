@@ -15,31 +15,32 @@ interface DashboardPageProps {
   params: Promise<{ storeId: string }>;
 }
 
-const DashboardPage = async (props: DashboardPageProps) => {  
-  const params = await props.params;
+const DashboardPage = async (props: DashboardPageProps) => {
+
+  const { storeId } = await props.params; 
 
   const store = await db.store.findFirst({
     where: {
-      id: params.storeId,
+      id: storeId,
     },
   });
 
   const banners = await db.banner.findMany({
       where: {
-        storeId: params.storeId
-      }
-  })
+        storeId: storeId,
+      },
+  });
 
   const products = await db.product.findMany({
     where: {
-        storeId: params.storeId
-    }
-  })
+        storeId: storeId,
+    },
+  });
   
-  const totalRevenue = await getTotalRevenue(params.storeId);
-  const graphData = await getGraphRevenue(params.storeId);
-  const recentSales = await getRecentSales(params.storeId);
-  const salesCount = await getSalesCount(params.storeId);
+  const totalRevenue = await getTotalRevenue(storeId);
+  const graphData = await getGraphRevenue(storeId);
+  const recentSales = await getRecentSales(storeId);
+  const salesCount = await getSalesCount(storeId);
 
   return (
 

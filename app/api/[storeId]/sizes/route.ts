@@ -4,11 +4,11 @@ import db from "@/lib/db";
 
 export async function POST(
   req: Request,
-  { params }: { params: { storeId: string } }
+  { params }: { params: Promise<{ storeId: string }> }
 ) {
   try {
     const { userId } = await auth();
-    const { storeId } = params;
+    const { storeId } = await params;
 
 
     const body = await req.json();
@@ -20,7 +20,10 @@ export async function POST(
     if (!storeId) return new NextResponse("Store id is required", { status: 400 });
 
     const storeByUserId = await db.store.findFirst({
-      where: { id: params.storeId, userId }
+      where: { 
+        id: storeId,
+        userId
+      }
     });
 
     if (!storeByUserId) return new NextResponse("Unauthorized", { status: 405 });
