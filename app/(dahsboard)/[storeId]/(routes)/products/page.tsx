@@ -21,6 +21,8 @@ const ProductsPage = async (props: ProductPageProps) => {
         },
         include: {
             category: true,
+            size: true,
+            color: true,
         },
         orderBy: {
             createdAt: 'desc'
@@ -34,7 +36,8 @@ const ProductsPage = async (props: ProductPageProps) => {
         isArchived: item.isArchived,
         price: formatter.format(parseFloat(item.price.toString())),
         category: item.category?.name || "No Category",
-        color: "-",
+        size: item.size?.name || "-",
+        color: item.color?.value || "-",
         createdAt: format(item.createdAt, "MMM do, yyyy")
     }));
 

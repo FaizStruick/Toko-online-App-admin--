@@ -40,7 +40,7 @@ export async function PATCH (
 
         const {userId} = await auth()
         const body = await req.json();
-        const {name, price, categoryId, images, isFeatured, isArchived} = body;
+        const {name, price, categoryId, sizeId, colorId, images, isFeatured, isArchived} = body;
 
         const params = await props.params;
 
@@ -58,6 +58,14 @@ export async function PATCH (
         }
         if(!categoryId){
             return new NextResponse("Harus menginput category" , {status: 400});
+        }
+
+        if(!sizeId){
+            return new NextResponse("Harus menginput size" , {status: 400});
+        }
+
+        if(!colorId){
+            return new NextResponse("Harus menginput color" , {status: 400});
         }
 
         if(!params.productId){
@@ -85,6 +93,8 @@ export async function PATCH (
                 isFeatured,
                 isArchived,
                 categoryId,
+                colorId,
+                sizeId,
                 images: {
                     deleteMany: {}
                 },

@@ -13,6 +13,8 @@ const ProductPage = async (
         include: {
             images: true,
             category: true,
+            size: true,
+            color: true,
         },
     })
 
@@ -34,14 +36,16 @@ const ProductPage = async (
         }
     })
 
+    const formattedProduct = product ? JSON.parse(JSON.stringify(product)) : null;
+
     return (
         <div className="flex-col">
             <div className="flex-1 space-y-4 p-8 pt-6">
             <ProductForm 
-                initialData={product} 
                 categories={categories}
                 sizes={sizes}
                 colors={colors}
+                initialData={formattedProduct}
                 />
             </div>
         </div>
