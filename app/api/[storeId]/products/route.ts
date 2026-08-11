@@ -14,6 +14,8 @@ export async function POST(
             name,
             price,
             categoryId,
+            sizeId,
+            colorId,
             images,
             isFeatured,
             isArchived,
@@ -41,8 +43,16 @@ export async function POST(
             return new NextResponse("Category ID perlu diinput", {status: 400});
         }
 
+        if(!sizeId){
+            return new NextResponse("Size ID perlu diinput", {status: 400});
+        }
+
+        if(!colorId){
+            return new NextResponse("Color ID perlu diinput", {status: 400});
+        }
+
         if(!params.storeId){
-            return new NextResponse("Store id URL dibutuhkan")
+            return new NextResponse("Store id URL dibutuhkan" , {status: 400});
         }
 
         const storeByUserId = await db.store.findFirst({
@@ -62,6 +72,8 @@ export async function POST(
                 name,
                 price,
                 categoryId,
+                sizeId,
+                colorId,
                 isFeatured,
                 isArchived,
                 storeId: params.storeId,
@@ -93,6 +105,8 @@ export async function GET(
 
         const {searchParams} = new URL(req.url);
         const categoryId = searchParams.get("categoryId") || undefined;
+        const sizeId = searchParams.get("sizeId") || undefined;
+        const colorId = searchParams.get("colorId") || undefined;
         const isFeatured = searchParams.get("isFeatured");
 
         if(!params.storeId){
@@ -103,6 +117,8 @@ export async function GET(
             where: {
                 storeId: params.storeId,
                 categoryId,
+                sizeId,
+                colorId,
                 isFeatured: isFeatured ? true : undefined,
                 isArchived: false,
             },

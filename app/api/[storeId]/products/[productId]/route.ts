@@ -22,6 +22,8 @@ export async function GET (
             include: {
                 images: true,
                 category: true,
+                size: true,
+                color: true,
             }
         });
         return NextResponse.json(product);    

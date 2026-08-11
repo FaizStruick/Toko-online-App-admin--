@@ -27,7 +27,7 @@ export async function POST(
         }
 
         if(!storeId){
-            return new NextResponse("Store id URL dibutuhkan")
+            return new NextResponse("Store id URL dibutuhkan", {status: 400});
         }
 
         const storeByUserId = await db.store.findFirst({
