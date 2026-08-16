@@ -108,6 +108,7 @@ export async function GET(
         const sizeId = searchParams.get("sizeId") || undefined;
         const colorId = searchParams.get("colorId") || undefined;
         const isFeatured = searchParams.get("isFeatured");
+        const name = searchParams.get("name") || undefined;
 
         if(!params.storeId){
             return new NextResponse("Store id URL dibutuhkan")
@@ -119,8 +120,14 @@ export async function GET(
                 categoryId,
                 sizeId,
                 colorId,
-                isFeatured: isFeatured ? true : undefined,
+                isFeatured: isFeatured === "true" ? true : undefined,
                 isArchived: false,
+                name: name
+                    ? {
+                        contains: name,
+                        mode: "insensitive"
+                    }
+                    : undefined,
             },
             include: {
                 images: true,
