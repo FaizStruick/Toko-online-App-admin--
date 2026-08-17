@@ -102,13 +102,16 @@ export async function GET(
     const params = await props.params;
 
     try {
-
         const {searchParams} = new URL(req.url);
         const categoryId = searchParams.get("categoryId") || undefined;
         const sizeId = searchParams.get("sizeId") || undefined;
         const colorId = searchParams.get("colorId") || undefined;
         const isFeatured = searchParams.get("isFeatured");
         const name = searchParams.get("name") || undefined;
+
+        const page = parseInt(searchParams.get("page") || "1");
+        const limit = parseInt(searchParams.get("limit") || "8");
+        const skip = (page - 1) * limit;
 
         if(!params.storeId){
             return new NextResponse("Store id URL dibutuhkan")
@@ -136,8 +139,10 @@ export async function GET(
                 color: true,
             },
             orderBy: {
-                createdAt: "desc"
-            }
+                createdAt: "desc",
+            },
+            skip,
+            take: limit,
         });
 
         return NextResponse.json(products);
