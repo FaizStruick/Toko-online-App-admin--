@@ -33,7 +33,7 @@ interface ProductFormProps {
 const formSchema = z.object({
     name: z.string().min(1, { message: "Nama produk wajib diisi" }),
     images: z.object({url: z.string()}).array().min(1, { message: "Minimal unggah 1 Gambar" }),
-    price: z.number().min(1, { message: "Harga harus lebih dari Rp 0" }),
+    price: z.coerce.number().min(1, { message: "Harga harus lebih dari Rp 0" }),
     categoryId: z.string().min(1, { message: "Kategori wajib diisi" }),
     colorId: z.string().min(1, { message: "Warna wajib diisi" }),
     sizeId: z.string().min(1, { message: "Ukuran wajib diisi" }),
@@ -180,11 +180,21 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                         <FormItem>
                             <FormLabel>Harga</FormLabel>
                             <FormControl>
-                                <Input placeholder="Rp" disabled={loading} {...field} type="number"/>
+                                <Input 
+                                    placeholder="Rp" 
+                                    disabled={loading} 
+                                    {...field}
+                                    value={(field.value as number) ?? ''}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        field.onChange(val === '' ? '' : Number(val));
+                                    }}
+                                    />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
-                )}/>
+                    )}
+                />
                 
             <FormField 
                 control={form.control}

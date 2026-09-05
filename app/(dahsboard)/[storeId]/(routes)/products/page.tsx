@@ -34,8 +34,8 @@ const ProductsPage = async (props: ProductPageProps) => {
         name: item.name,
         isFeatured: item.isFeatured,    
         isArchived: item.isArchived,
-        price: formatter.format(parseFloat(item.price.toString())),
-        category: item.category?.name || "No Category",
+        price: formatter.format(Number(item.price)),
+        category: item.category?.name || "Tanpa Kategori",
         size: item.size?.name || "-",
         color: item.color?.value || "-",
         createdAt: format(item.createdAt, "MMM do, yyyy")
